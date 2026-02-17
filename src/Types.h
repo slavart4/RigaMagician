@@ -45,14 +45,15 @@ enum Square : uint8_t {
  * @enum CastlingRights
  * @brief Bitmask to represent castling rights
  * @details Usage example:
+ * @code
  * uint8_t castling_rights = NO_CASTLING; // 0b00000000
  *
- * Add right for short castle for white
+ * // Add right for short castle for white
  * castling_rights |= WHITE_OO; // 0b00000000 |= 0b00000001 -> 0b00000001
  *
- * Add right for long castle for black
+ * // Add right for long castle for black
  * castling_rights |= BLACK_OOO; // 0b00000001 |= 0b00001000 -> 0b00001001
- *
+ * @endcode
  * So 0b00001001 -> both rights are active
  */
 enum CastlingRights : uint8_t {
@@ -61,6 +62,21 @@ enum CastlingRights : uint8_t {
     WHITE_OOO    = 1 << 1,  // 0b00000010
     BLACK_OO     = 1 << 2,  // 0b00000100
     BLACK_OOO    = 1 << 3   // 0b00001000
+};
+
+/*!
+ * @enum Direction
+ * @brief Represents bit shift to move on some direction
+ */
+enum Direction {
+    NORTH = 8,          /*!< Up */
+    SOUTH = -8,         /*!< Down */
+    EAST = 1,           /*!< Right */
+    WEST = -1,          /*!< Left */
+    NORTH_EAST = 9,     /*!< Diagonal up-right */
+    NORTH_WEST = 7,     /*!< Diagonal up-left */
+    SOUTH_EAST = -7,    /*!< Diagonal down-right */
+    SOUTH_WEST = -9     /*!< Diagonal down-left */
 };
 
 enum MoveFlag : uint8_t {

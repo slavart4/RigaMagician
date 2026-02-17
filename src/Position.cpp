@@ -162,16 +162,16 @@ bool Position::parse_castling_rights(const std::string& castling) {
  * @note Use another ascii trick with file_char and rank_char
  *
  * Example for file:
- * file_char = 'e';
- * 'e' - 'a' as chars
- * 101 - 97 as integers
- * 4 is 'e' file (bcs numeration starts with 0)
+ *  file_char = 'e';
+ *  'e' - 'a' as chars
+ *  101 - 97 as integers
+ *  4 is 'e' file (bcs numeration starts with 0)
  *
  * Example for rank:
- * rank_char = '3';
- * '3' - '1' as chars
- * 51 - 49 as integers
- * 2 is a 3-d rank (bcs numeration starts with 0)
+ *  rank_char = '3';
+ *  '3' - '1' as chars
+ *  51 - 49 as integers
+ *  2 is a 3-d rank (bcs numeration starts with 0)
  */
 bool Position::parse_en_passant(const std::string& ep) {
     if (ep == "-") {
