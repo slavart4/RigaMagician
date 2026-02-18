@@ -13,4 +13,6 @@ add_executable(RigaMagician src/main.cpp
         src/BitboardUtils.h
         src/Move.cpp
         src/Move.h
+        src/Attacks.cpp
+        src/Attacks.h
 )
