@@ -7,6 +7,7 @@
 namespace Rmagician {
 
 /*!
+ * @class BitboardUtils
  * @brief Utility functions for working with Bitboards
  *
  * These functions use CPU intrinsics for fast bitwise operations.

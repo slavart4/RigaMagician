@@ -1,27 +1,19 @@
 #ifndef RIGAMAGICIAN_POSITION_H
 #define RIGAMAGICIAN_POSITION_H
 
-#include "Bitboards.h"
-#include "Types.h"
 #include <string>
-#include <optional>
+#include "Bitboards.h"
+#include "Move.h"
 
 namespace Rmagician {
 
 /*!
  * @class Position
  * @brief Implements chess board's full state
- * @details
- * Includes:
- * - Pieces positions (using Bitboards)
- * - Side to move
- * - Castling rights
- * - En passant square
- * - Counters for 50-move rule and move number
  */
 class Position {
 public:
-    Position();
+    Position() = default;
 
     /*!
      * @brief Initialize board with standard start position
@@ -56,11 +48,8 @@ public:
      */
     void print() const;
 
-    Color side_to_move()                        const { return side_to_move_; }
-    uint8_t castling_rights()                   const { return castling_rights_; }
-    std::optional<Square> en_passant_square()   const { return en_passant_square_; }
-    int halfmove_clock()                        const { return halfmove_clock_; }
-    int fullmove_number()                       const { return fullmove_number_; }
+    void make_move(Move& m, UndoInfo& undo);
+    void undo_move(Move& m, UndoInfo& undo);
 
     const Bitboards& bitboards() const { return bitboards_; }
     Bitboards& bitboards() { return bitboards_; }
@@ -73,30 +62,9 @@ public:
 
 private:
     Bitboards bitboards_;
+    PositionDetails pd_;
 
-    Color side_to_move_;                        /*!< What side should move */
-    uint8_t castling_rights_;                   /*!< Castling rights bitmask */
-    std::optional<Square> en_passant_square_;   /*!< Square for en passant capture */
-    int halfmove_clock_;                        /*!< Counter for 50-move rule */
-    int fullmove_number_;                       /*!< Complete moves number (increments after black moves) */
-
-    /*!
-     * @brief Parse pieces positions from FEN
-     * @return true on success
-     */
-    bool parse_piece_placement(const std::string& placement);
-
-    /*!
-     * @brief Parse castling rights from FEN
-     * @return true on success
-     */
-    bool parse_castling_rights(const std::string& castling);
-
-    /*!
-     * @brief Parse en-passant square from FEN
-     * @return true on success
-     */
-    bool parse_en_passant(const std::string& ep);
+    void pawn_move(Move& m, MoveFlag flags);
 };
 
 } // namespace Rmagician

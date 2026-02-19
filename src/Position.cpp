@@ -1,268 +1,19 @@
 #include "Position.h"
-#include <sstream>
-#include <vector>
+#include "utils/FenHelper.h"
 
 namespace Rmagician {
-
-Position::Position()
-    : side_to_move_(WHITE)
-    , castling_rights_(NO_CASTLING)
-    , en_passant_square_(std::nullopt)
-    , halfmove_clock_(0)
-    , fullmove_number_(1) {}
 
 void Position::set_start_position() {
     // Standard start position in FEN notation
     (void)set_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
 
-/*!
- * @details Split standard start position has this parts:
- *   1. "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR" - pieces positions
- *   2. "w" -        side to move
- *   3. "KQkq" -     castling rights
- *                    K - white can castle to the king side
- *                    Q - white can castle to the queen side
- *                    k - black can castle to the king side
- *                    q - black can castle to the queen side
- *   4. "-" -        en passant square (empty for the start position)
- *   5. "0" -        halfmove clock
- *   6. "1" -        fullmove clock
- *
- * @see https://www.chess.com/terms/fen-chess
- */
 bool Position::set_from_fen(const std::string& fen) {
-    bitboards_ = Bitboards();
-
-    // split FEN into parts
-    std::istringstream iss(fen);
-    std::vector<std::string> parts;
-    std::string part;
-
-    while (iss >> part) {
-        parts.push_back(part);
-    }
-
-    // FEN should have at 6 parts (or at least 4)
-    if (parts.size() < 4) {
-        return false;
-    }
-
-    // 1. Parse pieces
-    if (!parse_piece_placement(parts[0])) {
-        return false;
-    }
-
-    // 2. Parse side to move
-    if (parts[1] == "w") {
-        side_to_move_ = WHITE;
-    } else if (parts[1] == "b") {
-        side_to_move_ = BLACK;
-    } else {
-        return false;
-    }
-
-    // 3. Castling rights
-    if (!parse_castling_rights(parts[2])) {
-        return false;
-    }
-
-    // 4. En passant
-    if (!parse_en_passant(parts[3])) {
-        return false;
-    }
-
-    // 5. Halfmove clock (optional)
-    if (parts.size() > 4) {
-        try {
-            halfmove_clock_ = std::stoi(parts[4]);
-        } catch (...) {
-            halfmove_clock_ = 0;
-        }
-    } else {
-        halfmove_clock_ = 0;
-    }
-
-    // 6. Fullmove number (optional)
-    if (parts.size() > 5) {
-        try {
-            fullmove_number_ = std::stoi(parts[5]);
-        } catch (...) {
-            fullmove_number_ = 1;
-        }
-    } else {
-        fullmove_number_ = 1;
-    }
-
-    return true;
-}
-
-/*!
- * @note
- * FEN describes board from top to bottom (8 rank -> 1 rank), but
- * Square enum from Types goes from bottom to top (A1=0, A8=56)
- */
-bool Position::parse_piece_placement(const std::string& placement) {
-    int rank = 7; // Starts from 8 rank (rank 7 by index)
-    int file = 0; // Starts from "A" column
-
-    for (char c : placement) {
-        if (c == '/') {
-            rank--; // Goes to the next rank
-            file = 0;
-            if (rank < 0) {
-                return false;
-            }
-        } else if (std::isdigit(c)) {
-            // Digits describes number of empty squares
-            int empty_squares = c - '0'; // ascii trick to convert char into int
-            file += empty_squares;
-            if (file > 8) {
-                return false;
-            }
-        } else { // Piece symbol
-            if (file >= 8) {
-                return false;
-            }
-
-            Square sq = static_cast<Square>(rank * 8 + file);
-
-            if (!notations_pieces.contains(c)) return false;
-            Piece piece = notations_pieces[c]; // define piece by notation
-
-            bitboards_.set_piece(sq, piece);
-            file++;
-        }
-    }
-
-    return rank == 0 && file == 8;  // Check if we filled whole board
-}
-
-bool Position::parse_castling_rights(const std::string& castling) {
-    castling_rights_ = NO_CASTLING;
-
-    if (castling == "-") {
-        return true;  // No castling rights
-    }
-
-    for (char c : castling) {
-        switch (c) {
-            case 'K': castling_rights_ |= WHITE_OO; break;
-            case 'Q': castling_rights_ |= WHITE_OOO; break;
-            case 'k': castling_rights_ |= BLACK_OO; break;
-            case 'q': castling_rights_ |= BLACK_OOO; break;
-            default: return false;
-        }
-    }
-
-    return true;
-}
-
-/*!
- * @note Use another ascii trick with file_char and rank_char
- *
- * Example for file:
- *  file_char = 'e';
- *  'e' - 'a' as chars
- *  101 - 97 as integers
- *  4 is 'e' file (bcs numeration starts with 0)
- *
- * Example for rank:
- *  rank_char = '3';
- *  '3' - '1' as chars
- *  51 - 49 as integers
- *  2 is a 3-d rank (bcs numeration starts with 0)
- */
-bool Position::parse_en_passant(const std::string& ep) {
-    if (ep == "-") {
-        en_passant_square_ = std::nullopt;
-        return true;
-    }
-
-    // En passant format column and raw (like "e3")
-    if (ep.length() != 2) {
-        return false;
-    }
-
-    char file_char = ep[0];
-    char rank_char = ep[1];
-
-    // board limits
-    if (file_char < 'a' || file_char > 'h' || rank_char < '1' || rank_char > '8') {
-        return false;
-    }
-
-    // ascii trick
-    int file = file_char - 'a';
-    int rank = rank_char - '1';
-
-    en_passant_square_ = static_cast<Square>(rank * 8 + file);
-    return true;
+    return FenHelper::parse_fen(fen, bitboards_, pd_);
 }
 
 std::string Position::to_fen() const {
-    std::string fen;
-
-    // 1. Pieces positions
-    for (int rank = 7; rank >= 0; rank--) {
-        int empty_count = 0;
-
-        for (int file = 0; file < 8; file++) {
-            Square sq = static_cast<Square>(rank * 8 + file);
-            Piece piece = bitboards_.piece_on(sq);
-
-            if (piece == PIECE_NUM) {
-                empty_count++;
-            } else {
-                if (empty_count > 0) {
-                    fen += std::to_string(empty_count);
-                    empty_count = 0;
-                }
-                fen += pieces_notations[piece];
-            }
-        }
-
-        if (empty_count > 0) {
-            fen += std::to_string(empty_count);
-        }
-
-        if (rank > 0) {
-            fen += '/';
-        }
-    }
-
-    // 2. Move order
-    fen += ' ';
-    fen += (side_to_move_ == WHITE) ? 'w' : 'b';
-
-    // 3. Castling rights
-    fen += ' ';
-    if (castling_rights_ == NO_CASTLING) {
-        fen += '-';
-    } else {
-        if (castling_rights_ & WHITE_OO) fen += 'K';
-        if (castling_rights_ & WHITE_OOO) fen += 'Q';
-        if (castling_rights_ & BLACK_OO) fen += 'k';
-        if (castling_rights_ & BLACK_OOO) fen += 'q';
-    }
-
-    // 4. En passant
-    fen += ' ';
-    if (en_passant_square_.has_value()) {
-        Square sq = en_passant_square_.value();
-        int file = sq % 8;
-        int rank = sq / 8;
-        fen += static_cast<char>('a' + file);
-        fen += static_cast<char>('1' + rank);
-    } else {
-        fen += '-';
-    }
-
-    // 5 і 6. Counters
-    fen += ' ' + std::to_string(halfmove_clock_);
-    fen += ' ' + std::to_string(fullmove_number_);
-
-    return fen;
+    return FenHelper::to_fen(bitboards_, pd_);
 }
 
 void Position::print() const {
@@ -282,7 +33,117 @@ void Position::print() const {
 
     std::cout << "    a   b   c   d   e   f   g   h\n\n";
     std::cout << "FEN: " << to_fen() << "\n";
-    std::cout << "Side to move: " << (side_to_move_ == WHITE ? "White" : "Black") << "\n";
+    std::cout << "Side to move: " << (pd_.side_to_move == WHITE ? "White" : "Black") << "\n";
+}
+
+void Position::make_move(Move& m, UndoInfo& undo) {
+    Piece moving_piece = bitboards_.piece_on(m.from());
+
+    // Save data for further unmake_move
+    undo.castling_rights = pd_.castling_rights;
+    undo.en_passant_square = pd_.en_passant_square;
+    undo.halfmove_clock = pd_.halfmove_clock;
+    undo.captured_piece = bitboards_.piece_on(m.to());
+
+    pd_.en_passant_square = std::nullopt;
+    pd_.halfmove_clock++;
+
+    if (m.flag() == CAPTURE || undo.captured_piece != PIECE_NUM) {
+        bitboards_.remove_piece(m.to());
+        pd_.halfmove_clock = 0;
+    }
+
+    bitboards_.move_piece(m.from(), m.to());
+
+    if ((moving_piece == W_PAWN || moving_piece == B_PAWN)) {
+        pawn_move(m, m.flag());
+    }
+
+    // Update castling rights if king moving
+    if (moving_piece == W_KING) pd_.castling_rights &= ~(WHITE_OO | WHITE_OOO);
+    if (moving_piece == B_KING) pd_.castling_rights &= ~(BLACK_OO | BLACK_OOO);
+
+    // Update castling rights if rook moving
+    if (m.from() == H1 || m.to() == H1) pd_.castling_rights &= ~WHITE_OO;
+    if (m.from() == A1 || m.to() == A1) pd_.castling_rights &= ~WHITE_OOO;
+    if (m.from() == H8 || m.to() == H8) pd_.castling_rights &= ~BLACK_OO;
+    if (m.from() == A8 || m.to() == A8) pd_.castling_rights &= ~BLACK_OOO;
+
+    // Castling
+    if (m.flag() == KING_CASTLE) {
+        if (pd_.side_to_move == WHITE) bitboards_.move_piece(H1, F1);
+        else bitboards_.move_piece(H8, F8);
+    } else if (m.flag() == QUEEN_CASTLE) {
+        if (pd_.side_to_move == WHITE) bitboards_.move_piece(A1, D1);
+        else bitboards_.move_piece(A8, D8);
+    }
+
+    // Change side to move
+    if (pd_.side_to_move == BLACK) pd_.fullmove_number++;
+    pd_.side_to_move = pd_.side_to_move == WHITE ? BLACK : WHITE;
+}
+
+void Position::pawn_move(Move &m, MoveFlag flags) {
+    pd_.halfmove_clock = 0; // Pawns moves reset counter by rule
+
+    // Double Pawn Push - set en passant square
+    if (flags == DOUBLE_PAWN_PUSH) {
+        pd_.en_passant_square = (pd_.side_to_move == WHITE) ?
+            static_cast<Square>(m.to() + SOUTH) :
+            static_cast<Square>(m.to() + NORTH);
+    }
+
+    // If there was en passant capture - square is no longer en passant
+    if (flags == EN_PASSANT) {
+        pd_.en_passant_square = std::nullopt;
+    }
+
+    if (flags == PROMOTION) {
+        bitboards_.move_piece(m.from(), m.to());
+    }
+}
+
+void Position::undo_move(Move& m, UndoInfo& undo) {
+    pd_.side_to_move = (pd_.side_to_move == WHITE) ? BLACK : WHITE;
+    if (pd_.side_to_move == BLACK) pd_.fullmove_number--;
+
+    Square from = m.from();
+    Square to = m.to();
+    MoveFlag flags = m.flag();
+
+    bitboards_.move_piece(to, from);
+
+    if (undo.captured_piece != PIECE_NUM) {
+        if (flags == EN_PASSANT) {
+            Square victim_sq {};
+            if(pd_.side_to_move == WHITE) {
+                victim_sq = static_cast<Square>(to + SOUTH);
+            } else {
+                victim_sq = static_cast<Square>(to + NORTH);
+            }
+            bitboards_.set_piece(victim_sq, undo.captured_piece);
+        } else {
+            bitboards_.set_piece(to, undo.captured_piece);
+        }
+    }
+
+    if (flags == KING_CASTLE) {
+        if (pd_.side_to_move == WHITE) bitboards_.move_piece(F1, H1);
+        else bitboards_.move_piece(F8, H8);
+    } else if (flags == QUEEN_CASTLE) {
+        if (pd_.side_to_move == WHITE) bitboards_.move_piece(D1, A1);
+        else bitboards_.move_piece(D8, A8);
+    }
+
+    if (flags == PROMOTION) {
+        Piece pawn = (pd_.side_to_move == WHITE) ? W_PAWN : B_PAWN;
+        bitboards_.remove_piece(from);
+        bitboards_.set_piece(from, pawn);
+    }
+
+    pd_.castling_rights = undo.castling_rights;
+    pd_.en_passant_square = undo.en_passant_square;
+    pd_.halfmove_clock = undo.halfmove_clock;
 }
 
 bool Position::has_king(Color c) const {

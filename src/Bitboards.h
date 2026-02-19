@@ -20,15 +20,15 @@ public:
 
     /*!
      * @brief Returns all squares occupied white/black pieces.
-     * @param c Types::Color
+     * @param c Color of pieces we want to get.
      * @return Bitboard (uint64_t)
      */
     Bitboard pieces(Color c) const;
 
     /*!
      * @brief Returns squares occupied by all white/black pieces of some type.
-     * @param pt Types::PieceType
-     * @param c  Types::Color
+     * @param pt PieceType of pieces we want to get.
+     * @param c  Color of pieces we want to get.
      * @return Bitboard (uint64_t)
      */
     Bitboard pieces(PieceType pt, Color c) const;
@@ -41,27 +41,27 @@ public:
 
     /*!
      * @brief Set piece on some square.
-     * @param square
-     * @param piece
+     * @param square Square to place piece
+     * @param piece Piece to place
      */
     void set_piece(Square square, Piece piece);
 
     /*!
      * @brief Remove piece from some square.
-     * @param square
+     * @param square Square to remove piece on it
      */
     void remove_piece(Square square);
 
     /*!
      * @brief Move piece from one square to another.
-     * @param from
-     * @param to
+     * @param from Square to get piece from
+     * @param to Square to set piece on it
      */
     void move_piece(Square from, Square to);
 
     /*!
      * @brief Returns piece from specified square.
-     * @param sq
+     * @param sq Square to get piece from it
      * @return Piece
      */
     Piece piece_on(Square sq) const { return board_[sq]; }

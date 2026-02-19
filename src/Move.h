@@ -13,10 +13,13 @@ namespace Rmagician {
  * `uint16_t` value:
  * - bits [0..5]   : source square (`from`)
  * - bits [6..11]  : destination square (`to`)
- * - bits [12..15] : move type (`MoveFlag`)
+ * - bits [12,13]  : promotion piece type (KNIGHT, BISHOP, ROOK, QUEEN)
+ * - bits [14..17] : move type (`MoveFlag`)
+ * - bits [18..32] : unused
  *
- * bits:  15 14 13 12 | 11 10 9 8 7 6 | 5 4 3 2 1 0
- *        flag        | to square     | from square
+ * bits:  | 32..18 | 17 16 15 14 | 13 12 | 11 10 9 8 7 6 | 5 4 3 2 1 0
+ *          unused | flag        | prom  | to square     | from square
+ *                                 piece
  *
  * This representation is efficient for move generation and search.
  */
@@ -52,7 +55,16 @@ public:
      * @brief Get move flag.
      * @return Encoded move type.
      */
-    MoveFlag flag() const { return static_cast<MoveFlag>(data_ >> 12); }
+    MoveFlag flag() const { return static_cast<MoveFlag>(data_ >> 14); }
+
+    /*!
+     * @brief Get piece pawn was turned into (by promotion)
+     * @return Piece
+     *
+     * @note 0x3 (hex) is 0b0011 (binary), so (data_) & 0x3 done to
+     * be sure that we take only 2 bits
+     */
+    Piece promotion_piece() const { return static_cast<Piece>((data_ >> 12) & 0x3); }
 
     /*!
      * @brief Check if move is empty.
@@ -61,7 +73,18 @@ public:
     bool is_none() const { return data_ == 0; }
 
 private:
-    uint16_t data_;
+    uint32_t data_;
+};
+
+/*!
+ * @struct UndoInfo
+ * @brief Saves position state to have possibility to undo it
+ */
+struct UndoInfo {
+    uint8_t castling_rights;
+    std::optional<Square> en_passant_square;
+    int halfmove_clock;
+    Piece captured_piece = PIECE_NUM;
 };
 
 } // namespace Rmagician

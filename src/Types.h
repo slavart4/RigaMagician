@@ -1,6 +1,7 @@
 #ifndef RIGAMAGICIAN_TYPES_H
 #define RIGAMAGICIAN_TYPES_H
 #include <iostream>
+#include <optional>
 #include <unordered_map>
 
 namespace Rmagician {
@@ -79,14 +80,41 @@ enum Direction {
     SOUTH_WEST = -9     /*!< Diagonal down-left */
 };
 
+// /*!
+//  * @enum MoveFlag
+//  * @brief Represents all possible move types
+//  */
+// enum MoveFlag : uint16_t {
+//     NORMAL,
+//     PROMOTION  = 1 << 14,
+//     EN_PASSANT = 2 << 14,
+//     CASTLING   = 3 << 14
+// };
+
+/*!
+ * @enum MoveFlag
+ * @brief Represents all possible move types
+ */
 enum MoveFlag : uint8_t {
-    QUIET,
-    CAPTURE,
-    DOUBLE_PAWN_PUSH,
-    KING_CASTLE,
-    QUEEN_CASTLE,
-    EN_PASSANT,
-    PROMOTION
+    QUIET,              /*!< Simple piece move */
+    CAPTURE,            /*!< Capture other piece */
+    DOUBLE_PAWN_PUSH,   /*!< Double push from pawns start position */
+    KING_CASTLE,        /*!< Castle to the short side */
+    QUEEN_CASTLE,       /*!< Castle to the long side */
+    EN_PASSANT,         /*!< En passant capture */
+    PROMOTION           /*!< Turning pawn into other piece */
+};
+
+/*!
+ * @struct PositionDetails
+ * @brief Non-board state required to fully describe a chess position.
+ */
+struct PositionDetails {
+    Color side_to_move = WHITE;                             /*!< What side should move */
+    uint8_t castling_rights = NO_CASTLING;                  /*!< Castling rights bitmask */
+    std::optional<Square> en_passant_square = std::nullopt; /*!< Square for en passant capture */
+    int halfmove_clock = 0;                                 /*!< Counter for 50-move rule */
+    int fullmove_number = 1;                                /*!< Complete moves number (increments after black moves) */
 };
 
 static std::unordered_map<Piece, char> pieces_notations {
