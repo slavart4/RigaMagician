@@ -3,18 +3,11 @@ project(RigaMagician)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(RigaMagician src/main.cpp
-        src/Position.cpp
-        src/Position.h
-        src/Types.h
-        src/Bitboards.cpp
-        src/Bitboards.h
-        src/utils/BitboardUtils.cpp
-        src/utils/BitboardUtils.h
-        src/Move.cpp
-        src/Move.h
-        src/Attacks.cpp
-        src/Attacks.h
-        src/utils/FenUtils.cpp
-        src/utils/FenUtils.h
-)
+add_subdirectory(src)
+
+option(BUILD_TESTS "Build tests" ON)
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
