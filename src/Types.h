@@ -110,19 +110,19 @@ enum MoveFlag : uint8_t {
  * @brief Non-board state required to fully describe a chess position.
  */
 struct PositionDetails {
-    Color side_to_move = WHITE;                             /*!< What side should move */
-    uint8_t castling_rights = NO_CASTLING;                  /*!< Castling rights bitmask */
-    std::optional<Square> en_passant_square = std::nullopt; /*!< Square for en passant capture */
-    int halfmove_clock = 0;                                 /*!< Counter for 50-move rule */
-    int fullmove_number = 1;                                /*!< Complete moves number (increments after black moves) */
+    Color side_to_move {WHITE};                             /*!< What side should move */
+    uint8_t castling_rights {NO_CASTLING};                  /*!< Castling rights bitmask */
+    std::optional<Square> en_passant_square {std::nullopt}; /*!< Square for en passant capture */
+    int halfmove_clock {0};                                 /*!< Counter for 50-move rule */
+    int fullmove_number {1};                                /*!< Complete moves number (increments after black moves) */
 };
 
 static std::unordered_map<Piece, char> pieces_notations {
-    {PIECE_NUM, ' '},
     {W_PAWN, 'P'}, {W_KNIGHT, 'N'}, {W_BISHOP, 'B'},
     {W_ROOK, 'R'}, {W_QUEEN, 'Q'}, {W_KING, 'K'},
     {B_PAWN, 'p'}, {B_KNIGHT, 'n'}, {B_BISHOP, 'b'},
-    {B_ROOK, 'r'}, {B_QUEEN, 'q'}, {B_KING, 'k'}
+    {B_ROOK, 'r'}, {B_QUEEN, 'q'}, {B_KING, 'k'},
+    {PIECE_NUM, ' '}
 };
 
 static std::unordered_map<char, Piece> notations_pieces {

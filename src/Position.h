@@ -24,16 +24,6 @@ public:
      * @brief Uploads position from FEN-notation
      * @param fen FEN-string
      * @return true on success, false otherwise
-     *
-     * @details FEN (Forsyth-Edwards Notation) has 6 parts:
-     * 1. Pieces positions (8 raws separated by "/")
-     * 2. Side to move (w or b)
-     * 3. Castling rights (KQkq or -)
-     * 4. En passant square (e3 or -)
-     * 5. Halfmove clock (for the 50-move rule)
-     * 6. Fullmove number (move number)
-     *
-     * Example: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
      */
     bool set_from_fen(const std::string& fen);
 
@@ -64,7 +54,9 @@ private:
     Bitboards bitboards_;
     PositionDetails pd_;
 
-    void pawn_move(Move& m, MoveFlag flags);
+    void process_pawn_move(Move& m);
+    void process_castling_rights(Move& m);
+    void process_castling(Move& m);
 };
 
 } // namespace Rmagician

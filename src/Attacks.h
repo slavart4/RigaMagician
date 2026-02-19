@@ -1,7 +1,7 @@
 #ifndef RIGAMAGICIAN_ATTACKS_H
 #define RIGAMAGICIAN_ATTACKS_H
 
-#include "BitboardUtils.h"
+#include "utils/BitboardUtils.h"
 
 /// TODO: for now we find pieces possible attacks "on fly"
 ///  but better rewrite to magic bitmasks

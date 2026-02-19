@@ -14,6 +14,16 @@ public:
      * @param bb Output board state.
      * @param pd Output non-board position details.
      * @return true on valid FEN, false otherwise.
+     *
+     * @details FEN (Forsyth-Edwards Notation) has 6 parts:
+     * 1. Pieces positions (8 raws separated by "/")
+     * 2. Side to move (w or b)
+     * 3. Castling rights (KQkq or -)
+     * 4. En passant square (e3 or -)
+     * 5. Halfmove clock (for the 50-move rule)
+     * 6. Fullmove number (move number)
+     *
+     * Example: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
      */
     static bool parse_fen(const std::string& fen, Bitboards& bb, PositionDetails& pd);
 

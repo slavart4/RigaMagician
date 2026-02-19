@@ -13,13 +13,12 @@ namespace Rmagician {
  * `uint16_t` value:
  * - bits [0..5]   : source square (`from`)
  * - bits [6..11]  : destination square (`to`)
- * - bits [12,13]  : promotion piece type (KNIGHT, BISHOP, ROOK, QUEEN)
- * - bits [14..17] : move type (`MoveFlag`)
- * - bits [18..32] : unused
+ * - bits [12..15] : promotion piece (W_KNIGHT, W_BISHOP, B_ROOK, etc..)
+ * - bits [16..19] : move type (`MoveFlag`)
+ * - bits [20..32] : unused
  *
- * bits:  | 32..18 | 17 16 15 14 | 13 12 | 11 10 9 8 7 6 | 5 4 3 2 1 0
- *          unused | flag        | prom  | to square     | from square
- *                                 piece
+ * bits:  | 32..20 | 19 18 17 16 | 15 14 13 12 | 11 10 9 8 7 6 | 5 4 3 2 1 0 |
+ *        | unused | flag        | prom piece  | to square     | from square |
  *
  * This representation is efficient for move generation and search.
  */
@@ -35,36 +34,45 @@ public:
      *  0x3F (hex) is 0b00111111, so (from & 0x3F) done to be sure that
      *  we get only first 6 bits
      */
-    Move(Square from, Square to, MoveFlag flag = QUIET) {
-        data_ = (from & 0x3F) | ((to & 0x3F) << 6) | (flag << 12);
+    Move(Square from, Square to, Piece prom_piece, MoveFlag flag = QUIET) {
+        data_ =
+            (static_cast<uint32_t>(from) & 0x3FU) |
+            ((static_cast<uint32_t>(to) & 0x3FU) << 6) |
+            ((static_cast<uint32_t>(prom_piece) & 0x0FU) << 12) |
+            ((static_cast<uint32_t>(flag) & 0x0FU) << 12);
     }
 
     /*!
      * @brief Get source square.
      * @return Source square from the encoded move.
      */
-    Square from() const { return static_cast<Square>(data_ & 0x3F); }
+    Square from() const {
+        return static_cast<Square>(data_ & 0x3FU);
+    }
 
     /*!
      * @brief Get destination square.
      * @return Destination square from the encoded move.
      */
-    Square to() const { return static_cast<Square>((data_ >> 6) & 0x3F); }
+    Square to() const {
+        return static_cast<Square>((data_ >> 6) & 0x3FU);
+    }
+
+    /*!
+     * @brief Get piece pawn was turned into (by promotion)
+     * @return Piece
+     */
+    Piece promotion_piece() const {
+        return static_cast<Piece>(((data_ >> 12) & 0x0FU));
+    }
 
     /*!
      * @brief Get move flag.
      * @return Encoded move type.
      */
-    MoveFlag flag() const { return static_cast<MoveFlag>(data_ >> 14); }
-
-    /*!
-     * @brief Get piece pawn was turned into (by promotion)
-     * @return Piece
-     *
-     * @note 0x3 (hex) is 0b0011 (binary), so (data_) & 0x3 done to
-     * be sure that we take only 2 bits
-     */
-    Piece promotion_piece() const { return static_cast<Piece>((data_ >> 12) & 0x3); }
+    MoveFlag flag() const {
+        return static_cast<MoveFlag>((data_ >> 16) & 0x0FU);
+    }
 
     /*!
      * @brief Check if move is empty.

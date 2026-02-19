@@ -1,7 +1,7 @@
 #ifndef RIGAMAGICIAN_BITBOARD_UTILS_H
 #define RIGAMAGICIAN_BITBOARD_UTILS_H
 
-#include "Types.h"
+#include "../Types.h"
 #include <string>
 
 namespace Rmagician {
