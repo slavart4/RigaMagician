@@ -1,4 +1,4 @@
-#include "FenHelper.h"
+#include "FenUtils.h"
 #include <cctype>
 #include <sstream>
 
@@ -19,7 +19,7 @@ namespace Rmagician {
  *
  * @see https://www.chess.com/terms/fen-chess
  */
-bool FenHelper::parse_fen(const std::string& fen, Bitboards& bb, PositionDetails& pd) {
+bool FenUtils::parse_fen(const std::string& fen, Bitboards& bb, PositionDetails& pd) {
     bb = Bitboards();
     pd = PositionDetails{};
 
@@ -78,7 +78,7 @@ bool FenHelper::parse_fen(const std::string& fen, Bitboards& bb, PositionDetails
     return true;
 }
 
-bool FenHelper::parse_piece_placement(const std::string& placement, Bitboards& bb) {
+bool FenUtils::parse_piece_placement(const std::string& placement, Bitboards& bb) {
     int rank = 7;
     int file = 0;
 
@@ -114,7 +114,7 @@ bool FenHelper::parse_piece_placement(const std::string& placement, Bitboards& b
     return rank == 0 && file == 8;
 }
 
-bool FenHelper::parse_castling_rights(const std::string& castling, PositionDetails& pd) {
+bool FenUtils::parse_castling_rights(const std::string& castling, PositionDetails& pd) {
     pd.castling_rights = NO_CASTLING;
 
     if (castling == "-") {
@@ -134,7 +134,7 @@ bool FenHelper::parse_castling_rights(const std::string& castling, PositionDetai
     return true;
 }
 
-bool FenHelper::parse_en_passant(const std::string& ep, PositionDetails& pd) {
+bool FenUtils::parse_en_passant(const std::string& ep, PositionDetails& pd) {
     if (ep == "-") {
         pd.en_passant_square = std::nullopt;
         return true;
@@ -157,7 +157,7 @@ bool FenHelper::parse_en_passant(const std::string& ep, PositionDetails& pd) {
     return true;
 }
 
-std::string FenHelper::to_fen(const Bitboards& bb, const PositionDetails& pd) {
+std::string FenUtils::to_fen(const Bitboards& bb, const PositionDetails& pd) {
     std::string fen;
 
     for (int rank = 7; rank >= 0; rank--) {

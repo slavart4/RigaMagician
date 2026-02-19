@@ -25,13 +25,21 @@ public:
     void init();
 
     /*!
+     * @brief Returns pawn attacks from a square.
+     * @param sq Source square.
+     * @param side Color of the pawn on square.
+     * @return Bitboard of squares attacked by pawns.
+     */
+    Bitboard get_pawn_attacks(Square sq, Color side) const;
+
+    /*!
      * @brief Returns rook attacks from a square.
      * @param sq Source square.
      * @param occupied Bitboard of all occupied squares.
      * @return Bitboard of attacked squares until first blocker
      * in each rook direction.
      */
-    Bitboard get_rook_attacks(Square sq, Bitboard occupied);
+    Bitboard get_rook_attacks(Square sq, Bitboard occupied) const;
 
     /*!
      * @brief Returns bishop attacks from a square.
@@ -40,7 +48,7 @@ public:
      * @return Bitboard of attacked squares until first blocker
      * in each bishop direction.
      */
-    Bitboard get_bishop_attacks(Square sq, Bitboard occupied);
+    Bitboard get_bishop_attacks(Square sq, Bitboard occupied) const;
 
     /*!
      * @brief Returns queen attacks from a square.
@@ -48,14 +56,14 @@ public:
      * @param occupied Bitboard of all occupied squares.
      * @return Union of rook and bishop attacks from the source square.
      */
-    Bitboard get_queen_attacks(Square sq, Bitboard occupied);
+    Bitboard get_queen_attacks(Square sq, Bitboard occupied) const;
 
     /*!
      * @brief Returns knight attacks from a square.
      * @param sq Source square.
      * @return Precomputed knight attack bitboard.
      */
-    Bitboard get_knight_attacks(Square sq);
+    Bitboard get_knight_attacks(Square sq) const;
 
     /*!
      * @brief Returns kings attacks from a square.
@@ -64,7 +72,8 @@ public:
      *
      * @note Returns pseudo-legal king moves (can be moved on attacked square)
      */
-    Bitboard get_king_attacks(Square sq);
+    Bitboard get_king_attacks(Square sq) const;
+
 private:
     /*!
      * @brief Traces attacks in one direction until the edge or blocker.
@@ -73,7 +82,7 @@ private:
      * @param occupied Bitboard of occupied squares.
      * @return Bitboard of squares attacked in some direction.
      */
-    Bitboard ray_attack(Square sq, Direction dir, Bitboard occupied);
+    Bitboard ray_attack(Square sq, Direction dir, Bitboard occupied) const;
 
     /*! Precomputed knight attacks for each square [0..63]. */
     Bitboard knight_attacks_[64] = {};

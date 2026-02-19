@@ -30,7 +30,7 @@ public:
      * @param to Destination square.
      * @param flag Move kind (quiet, capture, castling, promotion, etc.).
      *
-     * @note How bit operation works:
+     * @note How bitwise operation works:
      *  0x3F (hex) is 0b00111111, so (from & 0x3F) done to be sure that
      *  we get only first 6 bits
      */
@@ -39,7 +39,7 @@ public:
             (static_cast<uint32_t>(from) & 0x3FU) |
             ((static_cast<uint32_t>(to) & 0x3FU) << 6) |
             ((static_cast<uint32_t>(prom_piece) & 0x0FU) << 12) |
-            ((static_cast<uint32_t>(flag) & 0x0FU) << 12);
+            ((static_cast<uint32_t>(flag) & 0x0FU) << 16);
     }
 
     /*!

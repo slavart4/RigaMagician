@@ -28,7 +28,7 @@ void Attacks::init() {
     }
 }
 
-Bitboard Attacks::ray_attack(Square sq, Direction dir, Bitboard occupied) {
+Bitboard Attacks::ray_attack(Square sq, Direction dir, Bitboard occupied) const {
     Bitboard attacks = 0ULL;
     int rank = sq / 8;
     int file = sq % 8;
@@ -51,7 +51,18 @@ Bitboard Attacks::ray_attack(Square sq, Direction dir, Bitboard occupied) {
     return attacks;
 }
 
-Bitboard Attacks::get_rook_attacks(Square sq, Bitboard occupied) {
+Bitboard Attacks::get_pawn_attacks(Square sq, Color side) const {
+    Bitboard b = 1ULL << sq;
+    if (side == WHITE) {
+        return BitboardUtils::shift(b, NORTH_EAST) |
+               BitboardUtils::shift(b, NORTH_WEST);
+    }
+
+    return BitboardUtils::shift(b, SOUTH_EAST) |
+           BitboardUtils::shift(b, SOUTH_WEST);
+}
+
+Bitboard Attacks::get_rook_attacks(Square sq, Bitboard occupied) const {
     return
         ray_attack(sq, NORTH, occupied) |
         ray_attack(sq, SOUTH, occupied) |
@@ -59,7 +70,7 @@ Bitboard Attacks::get_rook_attacks(Square sq, Bitboard occupied) {
         ray_attack(sq, WEST, occupied);
 }
 
-Bitboard Attacks::get_bishop_attacks(Square sq, Bitboard occupied) {
+Bitboard Attacks::get_bishop_attacks(Square sq, Bitboard occupied) const {
     return
         ray_attack(sq, NORTH_EAST, occupied) |
         ray_attack(sq, NORTH_WEST, occupied) |
@@ -67,15 +78,15 @@ Bitboard Attacks::get_bishop_attacks(Square sq, Bitboard occupied) {
         ray_attack(sq, SOUTH_WEST, occupied);
 }
 
-Bitboard Attacks::get_queen_attacks(Square sq, Bitboard occupied) {
+Bitboard Attacks::get_queen_attacks(Square sq, Bitboard occupied) const {
     return get_rook_attacks(sq, occupied) |
            get_bishop_attacks(sq, occupied);
 }
 
-Bitboard Attacks::get_knight_attacks(Square sq) {
+Bitboard Attacks::get_knight_attacks(Square sq) const {
     return knight_attacks_[sq];
 }
-Bitboard Attacks::get_king_attacks(Square sq) {
+Bitboard Attacks::get_king_attacks(Square sq) const {
     return king_attacks_[sq];
 }
 

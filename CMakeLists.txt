@@ -15,6 +15,6 @@ add_executable(RigaMagician src/main.cpp
         src/Move.h
         src/Attacks.cpp
         src/Attacks.h
-        src/utils/FenHelper.cpp
-        src/utils/FenHelper.h
+        src/utils/FenUtils.cpp
+        src/utils/FenUtils.h
 )

@@ -6,7 +6,7 @@
 
 namespace Rmagician {
 
-class FenHelper {
+class FenUtils {
 public:
     /*!
      * @brief Parse FEN string and write resulting state into output arguments.

@@ -99,7 +99,7 @@ namespace BitboardUtils {
      * }
      * @endcode
      *
-     * @note How bit operations works
+     * @note How bitwise operations works:
      *  00101000 - 1 -> 00100111
      *  00101000 &= 00100111 -> 00100000
      *  So we removed least significant set bit (LSB)
@@ -161,7 +161,7 @@ namespace BitboardUtils {
      * @param sq Square
      * @return File index (0=A, 1=B, ..., 7=H)
      *
-     * @note How bit operations works:
+     * @note How bitwise operations works:
      *  D2 square is 11 in Square enum (0b00001011)
      *  7 (0b00000111)
      *  0b00001011 & 0b00000111 -> 0b00000011 (3) - D file
@@ -175,7 +175,7 @@ namespace BitboardUtils {
      * @param sq Square
      * @return Rank index (0=1st rank, 1=2nd rank, ..., 7=8th rank)
      *
-     * @note How bit operations works:
+     * @note How bitwise operations works:
      *  D2 square is 11 in Square enum (0b00001011)
      *  0b00001011 >> 3 -> 0b00000001 (1) - Second raw
      */
@@ -236,7 +236,7 @@ namespace BitboardUtils {
      * @return Shifted bitboard
      *
      * @details Useful for pawn moves and attacks
-     * @note How bit operation works
+     * @note How bitwise operation works:
      *  All squares on H file:
      *  0x8080808080808080ULL - in hex format
      *  0b1000000010000000100000001000000010000000100000001000000010000000 - in binary

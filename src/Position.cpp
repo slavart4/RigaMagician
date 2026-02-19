@@ -1,5 +1,5 @@
 #include "Position.h"
-#include "utils/FenHelper.h"
+#include "utils/FenUtils.h"
 #include "utils/BitboardUtils.h"
 
 namespace Rmagician {
@@ -10,11 +10,11 @@ void Position::set_start_position() {
 }
 
 bool Position::set_from_fen(const std::string& fen) {
-    return FenHelper::parse_fen(fen, bitboards_, pd_);
+    return FenUtils::parse_fen(fen, bitboards_, pd_);
 }
 
 std::string Position::to_fen() const {
-    return FenHelper::to_fen(bitboards_, pd_);
+    return FenUtils::to_fen(bitboards_, pd_);
 }
 
 void Position::print() const {
@@ -191,6 +191,49 @@ void Position::undo_move(Move& m, UndoInfo& undo) {
 bool Position::has_king(Color c) const {
     Bitboard kings = bitboards_.pieces(KING, c);
     return kings != 0;
+}
+
+/// TODO: fix
+/*!
+ * @note
+ * Bitboards are checked with bitwise AND:
+ * `attacks_mask & pieces_mask`.
+ * If result is non-zero, at least one attacker exists on an attacked square.
+ *
+ * Example (8-bit fragment for simplicity):
+ * attacks_mask = 0b00101000
+ * pieces_mask  = 0b00001000
+ * AND result   = 0b00001000 (non-zero) -> square is attacked.
+ *
+ * If pieces_mask = 0b00010000 then:
+ * 0b00101000 & 0b00010000 = 0b00000000 -> no attacker on attack squares.
+ */
+bool Position::is_square_attacked(Square sq, Color attacker_color) const {
+    Bitboard pawns = bitboards_.pieces(PAWN, attacker_color);
+    if (attacks_.get_pawn_attacks(sq, (attacker_color == WHITE ? BLACK : WHITE)) & pawns)
+        return true;
+
+    Bitboard knights = bitboards_.pieces(KNIGHT, attacker_color);
+    if (attacks_.get_knight_attacks(sq) & knights)
+        return true;
+
+    Bitboard king = bitboards_.pieces(KING, attacker_color);
+    if (attacks_.get_king_attacks(sq) & king)
+        return true;
+
+    Bitboard occupied = bitboards_.all();
+
+    Bitboard bishops_queens = bitboards_.pieces(BISHOP, attacker_color) |
+                              bitboards_.pieces(QUEEN, attacker_color);
+    if (attacks_.get_bishop_attacks(sq, occupied) & bishops_queens)
+        return true;
+
+    Bitboard rooks_queens = bitboards_.pieces(ROOK, attacker_color) |
+                            bitboards_.pieces(QUEEN, attacker_color);
+    if (attacks_.get_rook_attacks(sq, occupied) & rooks_queens)
+        return true;
+
+    return false;
 }
 
 } // namespace Rmagician
