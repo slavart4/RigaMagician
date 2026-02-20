@@ -7,14 +7,14 @@ void Attacks::init() {
         Bitboard b = 1ULL << s;
 
         knight_attacks_[s] =
-            BitboardUtils::shift(b, static_cast<Direction>(NORTH+NORTH_EAST)) |
-            BitboardUtils::shift(b, static_cast<Direction>(NORTH+NORTH_WEST)) |
-            BitboardUtils::shift(b, static_cast<Direction>(SOUTH+SOUTH_EAST)) |
-            BitboardUtils::shift(b, static_cast<Direction>(SOUTH+SOUTH_WEST)) |
-            BitboardUtils::shift(b, static_cast<Direction>(EAST+NORTH_EAST))  |
-            BitboardUtils::shift(b, static_cast<Direction>(EAST+SOUTH_EAST))  |
-            BitboardUtils::shift(b, static_cast<Direction>(WEST+NORTH_WEST))  |
-            BitboardUtils::shift(b, static_cast<Direction>(WEST+SOUTH_WEST));
+            BitboardUtils::shift(BitboardUtils::shift(b, NORTH), NORTH_EAST) |
+            BitboardUtils::shift(BitboardUtils::shift(b, NORTH), NORTH_WEST) |
+            BitboardUtils::shift(BitboardUtils::shift(b, SOUTH), SOUTH_EAST) |
+            BitboardUtils::shift(BitboardUtils::shift(b, SOUTH), SOUTH_WEST) |
+            BitboardUtils::shift(BitboardUtils::shift(b, EAST), NORTH_EAST)  |
+            BitboardUtils::shift(BitboardUtils::shift(b, EAST), SOUTH_EAST)  |
+            BitboardUtils::shift(BitboardUtils::shift(b, WEST), NORTH_WEST)  |
+            BitboardUtils::shift(BitboardUtils::shift(b, WEST), SOUTH_WEST);
 
         king_attacks_[s] =
             BitboardUtils::shift(b, NORTH) |
