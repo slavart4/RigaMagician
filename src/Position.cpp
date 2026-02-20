@@ -193,7 +193,6 @@ bool Position::has_king(Color c) const {
     return kings != 0;
 }
 
-/// TODO: fix
 /*!
  * @note
  * Bitboards are checked with bitwise AND:

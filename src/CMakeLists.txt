@@ -6,7 +6,6 @@ add_library(RigaMagicianLib
         Bitboards.h
         utils/BitboardUtils.cpp
         utils/BitboardUtils.h
-        Move.cpp
         Move.h
         Attacks.cpp
         Attacks.h

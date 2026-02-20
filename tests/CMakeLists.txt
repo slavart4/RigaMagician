@@ -12,6 +12,7 @@ if(TEST_SOURCES)
 
     add_executable(RigaMagicianTests
             ${TEST_SOURCES}
+            bitboard_utils_test.cpp
     )
 
     target_link_libraries(RigaMagicianTests

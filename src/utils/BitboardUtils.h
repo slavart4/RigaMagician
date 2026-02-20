@@ -235,23 +235,32 @@ namespace BitboardUtils {
      * @param dir Shift direction
      * @return Shifted bitboard
      *
-     * @details Useful for pawn moves and attacks
+     * @details Useful for pawn moves and attacks.
+     * Prevents wrap-around from the A to H file, etc.
+     *
      * @note How bitwise operation works:
      *  All squares on H file:
      *  0x8080808080808080ULL - in hex format
      *  0b1000000010000000100000001000000010000000100000001000000010000000 - in binary
+     *  So bb & ~H_FILE - removing all pieces from H_FILE before moving
      */
     inline Bitboard shift(Bitboard bb, Direction dir) {
+        constexpr Bitboard A_FILE = 0x0101010101010101ULL;
+        constexpr Bitboard H_FILE = 0x8080808080808080ULL;
+
+        if (dir == EAST || dir == NORTH_EAST || dir == SOUTH_EAST) {
+            bb &= ~H_FILE;
+        } else if (dir == WEST || dir == NORTH_WEST || dir == SOUTH_WEST) {
+            bb &= ~A_FILE;
+        }
+
         if (dir > 0) {
-            if (dir == EAST || dir == NORTH_EAST || dir == SOUTH_EAST) {
-                bb &= ~0x8080808080808080ULL; // Clear H-file
-            }
             return bb << dir;
         }
-        if (dir == WEST || dir == NORTH_WEST || dir == SOUTH_WEST) {
-            bb &= ~0x0101010101010101ULL; // Clear A-file
+        if (dir < 0) {
+            return bb >> (-dir);
         }
-        return bb >> (-dir);
+        return bb;
     }
 
 } // namespace BitboardUtils

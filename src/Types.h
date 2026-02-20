@@ -25,8 +25,8 @@ enum PieceType : uint8_t {
 };
 
 enum Piece : int {
-    W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING,
-    B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING,
+    W_PAWN, W_ROOK, W_KNIGHT, W_BISHOP, W_QUEEN, W_KING,
+    B_PAWN, B_ROOK, B_KNIGHT, B_BISHOP, B_QUEEN, B_KING,
     PIECE_NUM
 };
 
@@ -79,17 +79,6 @@ enum Direction {
     SOUTH_EAST = -7,    /*!< Diagonal down-right */
     SOUTH_WEST = -9     /*!< Diagonal down-left */
 };
-
-// /*!
-//  * @enum MoveFlag
-//  * @brief Represents all possible move types
-//  */
-// enum MoveFlag : uint16_t {
-//     NORMAL,
-//     PROMOTION  = 1 << 14,
-//     EN_PASSANT = 2 << 14,
-//     CASTLING   = 3 << 14
-// };
 
 /*!
  * @enum MoveFlag
