@@ -1,5 +1,6 @@
 #ifndef RIGAMAGICIAN_TYPES_H
 #define RIGAMAGICIAN_TYPES_H
+#include <cstdint>
 #include <iostream>
 #include <optional>
 #include <unordered_map>

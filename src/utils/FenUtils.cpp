@@ -1,6 +1,6 @@
 #include "FenUtils.h"
-#include <cctype>
 #include <sstream>
+#include <vector>
 
 namespace Rmagician {
 
