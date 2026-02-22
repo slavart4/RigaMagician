@@ -15,6 +15,8 @@ add_library(RigaMagicianLib
         utils/FenUtils.h
         Evaluation.cpp
         Evaluation.h
+        Search.cpp
+        Search.h
 )
 
 target_include_directories(RigaMagicianLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

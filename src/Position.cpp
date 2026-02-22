@@ -241,4 +241,11 @@ bool Position::is_square_attacked(Square sq, Color attacker_color) const {
     return false;
 }
 
+Square Position::king_square(Color side) const {
+    Bitboard kings = bitboards_.pieces(KING, side);
+    if (!kings) {
+        return SQUARE_NUM;
+    }
+    return static_cast<Square>(BitboardUtils::lsb(kings));
+}
 } // namespace Rmagician

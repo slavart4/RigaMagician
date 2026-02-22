@@ -82,7 +82,14 @@ public:
      * @brief Return side that moves in current position
      * @return Color of moving side
      */
-    Color side_to_move() const { return pd_.side_to_move;  }
+    Color side_to_move() const { return pd_.side_to_move; }
+
+    /*!
+     * @brief Return square with king
+     * @param side Color of the moving side
+     * @return Square with king
+     */
+    Square king_square(Color side) const;
 private:
     Bitboards bitboards_;
     PositionDetails pd_;
