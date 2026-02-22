@@ -5,6 +5,7 @@
 #include "MoveGenerator.h"
 #include "Evaluation.h"
 
+///TODO: add Move Ordering and Transposition Table
 namespace Rmagician {
 
     class Search {
@@ -32,7 +33,6 @@ namespace Rmagician {
          */
         int negamax(Position& pos, int depth, int alpha, int beta);
 
-        // Пошук спокою для уникнення тактичних помилок на "горизонті"
         /*!
          *
          * @param pos

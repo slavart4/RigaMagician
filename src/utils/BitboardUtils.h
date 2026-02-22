@@ -1,8 +1,9 @@
 #ifndef RIGAMAGICIAN_BITBOARD_UTILS_H
 #define RIGAMAGICIAN_BITBOARD_UTILS_H
 
-#include "../Types.h"
+#include "../Move.h"
 #include <string>
+#include <cctype>
 
 namespace Rmagician {
 
@@ -199,9 +200,10 @@ namespace BitboardUtils {
      * @return String representation
      */
     inline std::string square_to_string(Square sq) {
-        char file = 'a' + file_of(sq); // int to char letters convert ascii trick
-        char rank = '1' + rank_of(sq); // int to char numbers convert ascii trick
-        return std::string(1, file) + std::string(1, rank);
+        if (sq >= SQUARE_NUM) {
+            return "a1";
+        }
+        return squares_notations[sq];
     }
 
     /*!
@@ -220,6 +222,31 @@ namespace BitboardUtils {
         }
 
         return make_square(file, rank);
+    }
+
+    /*!
+     * @brief Converts move to UCI notation string (e.g. "e2e4", "a7a8q")
+     * @param m Move
+     * @return String representation in UCI format
+     */
+    inline std::string move_to_string(Move m) {
+        if (m.is_none()) {
+            return "0000";
+        }
+
+        std::string out = square_to_string(m.from()) + square_to_string(m.to());
+        if (m.flag() != PROMOTION) {
+            return out;
+        }
+
+        const Piece promoted_piece = m.promotion_piece();
+        auto piece_it = pieces_notations.find(promoted_piece);
+        if (piece_it == pieces_notations.end()) {
+            return out + "q";
+        }
+
+        out.push_back(static_cast<char>(std::tolower(piece_it->second)));
+        return out;
     }
 
     /*!

@@ -1,11 +1,6 @@
-#include "Position.h"
-
-using namespace Rmagician;
+#include "UCI.h"
 
 int main() {
-    Position position;
-    position.set_start_position();
-    position.print();
-
+    Rmagician::UCI::loop();
     return 0;
 }
