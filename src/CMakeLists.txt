@@ -9,6 +9,8 @@ add_library(RigaMagicianLib
         Move.h
         Attacks.cpp
         Attacks.h
+        MoveGenerator.cpp
+        MoveGenerator.h
         utils/FenUtils.cpp
         utils/FenUtils.h
 )

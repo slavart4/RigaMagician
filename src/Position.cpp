@@ -209,28 +209,34 @@ bool Position::has_king(Color c) const {
  */
 bool Position::is_square_attacked(Square sq, Color attacker_color) const {
     Bitboard pawns = bitboards_.pieces(PAWN, attacker_color);
-    if (attacks_.get_pawn_attacks(sq, (attacker_color == WHITE ? BLACK : WHITE)) & pawns)
+    if (attacks_.get_pawn_attacks(sq, (attacker_color == WHITE ? BLACK : WHITE)) & pawns) {
         return true;
+    }
 
     Bitboard knights = bitboards_.pieces(KNIGHT, attacker_color);
-    if (attacks_.get_knight_attacks(sq) & knights)
+    if (attacks_.get_knight_attacks(sq) & knights) {
         return true;
+    }
 
     Bitboard king = bitboards_.pieces(KING, attacker_color);
-    if (attacks_.get_king_attacks(sq) & king)
+    if (attacks_.get_king_attacks(sq) & king) {
         return true;
+    }
 
     Bitboard occupied = bitboards_.all();
 
     Bitboard bishops_queens = bitboards_.pieces(BISHOP, attacker_color) |
                               bitboards_.pieces(QUEEN, attacker_color);
-    if (attacks_.get_bishop_attacks(sq, occupied) & bishops_queens)
+
+    if (attacks_.get_bishop_attacks(sq, occupied) & bishops_queens) {
         return true;
+    }
 
     Bitboard rooks_queens = bitboards_.pieces(ROOK, attacker_color) |
                             bitboards_.pieces(QUEEN, attacker_color);
-    if (attacks_.get_rook_attacks(sq, occupied) & rooks_queens)
+    if (attacks_.get_rook_attacks(sq, occupied) & rooks_queens) {
         return true;
+    }
 
     return false;
 }

@@ -24,6 +24,8 @@ namespace Rmagician {
  */
 class Move {
 public:
+    Move() : data_(0) {}
+
     /*!
      * @brief Construct a move from source and destination squares.
      * @param from Source square.

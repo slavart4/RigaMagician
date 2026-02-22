@@ -65,6 +65,24 @@ public:
      *  5. Rooks and queen linear attacks
      */
     bool is_square_attacked(Square sq, Color attacker_color) const;
+
+    /*!
+     * @brief Method that returns castling rights on current position
+     * @return uint8_t mask of castling rights
+     */
+    uint8_t castling_rights() const { return pd_.castling_rights; }
+
+    /*!
+     * @brief Method that returns en passant on current position
+     * @return std::optional<Square>
+     */
+    std::optional<Square> en_passant_square() const { return pd_.en_passant_square; }
+
+    /*!
+     * @brief Return side that moves in current position
+     * @return Color of moving side
+     */
+    Color side_to_move() const { return pd_.side_to_move;  }
 private:
     Bitboards bitboards_;
     PositionDetails pd_;
