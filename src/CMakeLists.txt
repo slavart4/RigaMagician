@@ -13,6 +13,8 @@ add_library(RigaMagicianLib
         MoveGenerator.h
         utils/FenUtils.cpp
         utils/FenUtils.h
+        Evaluation.cpp
+        Evaluation.h
 )
 
 target_include_directories(RigaMagicianLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
