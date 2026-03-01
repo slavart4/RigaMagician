@@ -46,10 +46,23 @@ void Position::make_move(Move& m, UndoInfo& undo) {
     undo.halfmove_clock =       pd_.halfmove_clock;
     undo.captured_piece =       bitboards_.piece_on(m.to());
 
+    Square en_passant_captured_sq = SQUARE_NUM;
+    if (m.flag() == EN_PASSANT) {
+        en_passant_captured_sq = (pd_.side_to_move == WHITE)
+            ? static_cast<Square>(m.to() + SOUTH)
+            : static_cast<Square>(m.to() + NORTH);
+        undo.captured_piece = bitboards_.piece_on(en_passant_captured_sq);
+    }
+
+    process_castling_rights(m, moving_piece, undo.captured_piece);
+
     pd_.en_passant_square = std::nullopt;
     pd_.halfmove_clock++;
 
     bitboards_.move_piece(m.from(), m.to());
+    if (m.flag() == EN_PASSANT && en_passant_captured_sq != SQUARE_NUM) {
+        bitboards_.remove_piece(en_passant_captured_sq);
+    }
 
     if (m.flag() == CAPTURE || undo.captured_piece != PIECE_NUM) {
         pd_.halfmove_clock = 0;
@@ -57,11 +70,6 @@ void Position::make_move(Move& m, UndoInfo& undo) {
 
     if (moving_piece == W_PAWN || moving_piece == B_PAWN) {
         process_pawn_move(m);
-    }
-
-    if (moving_piece == W_KING || moving_piece == B_KING
-        || moving_piece == W_ROOK || moving_piece == B_ROOK) {
-        process_castling_rights(m);
     }
 
     // Castling
@@ -116,19 +124,27 @@ void Position::process_pawn_move(Move &m) {
     }
 }
 
-void Position::process_castling_rights(Move &m) {
-    Piece moving_piece = bitboards_.piece_on(m.from());
-
+void Position::process_castling_rights(const Move& m, Piece moving_piece, Piece captured_piece) {
     // Update castling rights if king moving
     if (moving_piece == W_KING) pd_.castling_rights &= ~(WHITE_OO | WHITE_OOO);
     if (moving_piece == B_KING) pd_.castling_rights &= ~(BLACK_OO | BLACK_OOO);
 
     // Update castling rights if rook moving from start position
-    if (moving_piece == W_ROOK || moving_piece == B_ROOK) {
-        if (m.from() == H1 || m.to() == H1) pd_.castling_rights &= ~WHITE_OO;
-        if (m.from() == A1 || m.to() == A1) pd_.castling_rights &= ~WHITE_OOO;
-        if (m.from() == H8 || m.to() == H8) pd_.castling_rights &= ~BLACK_OO;
-        if (m.from() == A8 || m.to() == A8) pd_.castling_rights &= ~BLACK_OOO;
+    if (moving_piece == W_ROOK) {
+        if (m.from() == H1) pd_.castling_rights &= ~WHITE_OO;
+        if (m.from() == A1) pd_.castling_rights &= ~WHITE_OOO;
+    } else if (moving_piece == B_ROOK) {
+        if (m.from() == H8) pd_.castling_rights &= ~BLACK_OO;
+        if (m.from() == A8) pd_.castling_rights &= ~BLACK_OOO;
+    }
+
+    // Update castling rights if rook was captured on its home square
+    if (captured_piece == W_ROOK) {
+        if (m.to() == H1) pd_.castling_rights &= ~WHITE_OO;
+        if (m.to() == A1) pd_.castling_rights &= ~WHITE_OOO;
+    } else if (captured_piece == B_ROOK) {
+        if (m.to() == H8) pd_.castling_rights &= ~BLACK_OO;
+        if (m.to() == A8) pd_.castling_rights &= ~BLACK_OOO;
     }
 }
 

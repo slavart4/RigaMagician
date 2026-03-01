@@ -67,6 +67,19 @@ TEST(SearchTest, ChoosesLargeMaterialCaptureWhenAvailable) {
     EXPECT_THAT(best.flag(), Eq(CAPTURE));
 }
 
+TEST(SearchTest, BlackAlsoChoosesLargeMaterialCaptureWhenAvailable) {
+    Position position;
+    Search search;
+
+    ASSERT_TRUE(position.set_from_fen("4k3/8/8/8/8/8/7q/4K2R b - - 0 1"));
+
+    const Move best = search.find_best_move(position, Search::SearchParams{2});
+
+    EXPECT_THAT(best.from(), Eq(H2));
+    EXPECT_THAT(best.to(), Eq(H1));
+    EXPECT_THAT(best.flag(), Eq(CAPTURE));
+}
+
 TEST(SearchTest, PrefersQueenPromotionInSimplePromotionRace) {
     Position position;
     Search search;

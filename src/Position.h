@@ -96,7 +96,7 @@ private:
     Attacks attacks_;
 
     void process_pawn_move(Move& m);
-    void process_castling_rights(Move& m);
+    void process_castling_rights(const Move& m, Piece moving_piece, Piece captured_piece);
     void process_castling(Move& m);
 };
 

@@ -80,6 +80,55 @@ TEST(PositionTest, MakeMoveThenUndoRestoresStateForKingCastle) {
     EXPECT_THAT(position.to_fen(), Eq(before));
 }
 
+TEST(PositionTest, KingMoveClearsBothCastlingRights) {
+    Position position;
+    ASSERT_TRUE(position.set_from_fen("4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1"));
+
+    Move move(E1, E2, PIECE_NUM, QUIET);
+    UndoInfo undo{};
+    position.make_move(move, undo);
+
+    EXPECT_THAT(position.castling_rights(), Eq(0));
+}
+
+TEST(PositionTest, RookMoveClearsOnlyCorrespondingCastlingRight) {
+    Position position;
+    ASSERT_TRUE(position.set_from_fen("4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1"));
+
+    Move move(H1, H2, PIECE_NUM, QUIET);
+    UndoInfo undo{};
+    position.make_move(move, undo);
+
+    EXPECT_THAT(position.castling_rights(), Eq(WHITE_OOO));
+}
+
+TEST(PositionTest, CapturingHomeRookClearsDefenderCastlingRight) {
+    Position position;
+    ASSERT_TRUE(position.set_from_fen("4k3/8/8/8/8/8/7b/4K2R b K - 0 1"));
+
+    Move move(H2, H1, PIECE_NUM, CAPTURE);
+    UndoInfo undo{};
+    position.make_move(move, undo);
+
+    EXPECT_THAT(position.castling_rights(), Eq(0));
+}
+
+TEST(PositionTest, EnPassantCaptureRemovesPawnAndUndoRestoresState) {
+    Position position;
+    ASSERT_TRUE(position.set_from_fen("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1"));
+    const std::string before = position.to_fen();
+
+    Move move(E5, D6, PIECE_NUM, EN_PASSANT);
+    UndoInfo undo{};
+    position.make_move(move, undo);
+
+    EXPECT_THAT(position.bitboards().piece_on(D6), Eq(W_PAWN));
+    EXPECT_THAT(position.bitboards().piece_on(D5), Eq(PIECE_NUM));
+
+    position.undo_move(move, undo);
+    EXPECT_THAT(position.to_fen(), Eq(before));
+}
+
 TEST(PositionTest, PromotionReplacesPawnWithPromotedPiece) {
     Position position;
     ASSERT_TRUE(position.set_from_fen("4k3/4P3/8/8/8/8/8/4K3 w - - 0 1"));

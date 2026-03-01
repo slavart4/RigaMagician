@@ -89,6 +89,10 @@ int Search::negamax(Position& pos, int depth, int alpha, int beta) {
 
 int Search::quiescence(Position& pos, int alpha, int beta) {
     int stand_pat = Evaluation::evaluate(pos);
+    // Negamax expects scores from the side-to-move perspective.
+    if (pos.side_to_move() == BLACK) {
+        stand_pat = -stand_pat;
+    }
     if (stand_pat >= beta) return beta;
     if (alpha < stand_pat) alpha = stand_pat;
 
